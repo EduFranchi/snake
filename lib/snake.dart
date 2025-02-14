@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:snake/enums/direction_enum.dart';
@@ -19,6 +21,9 @@ class _SnakeState extends State<Snake> {
   bool _screenReady = false;
   DirectionEnum _direction = DirectionEnum.right;
   List<List<Pixel>> _pixelList = [];
+  List<Pixel> _snakeList = [];
+
+  late Timer _timer;
 
   @override
   void initState() {
@@ -47,6 +52,23 @@ class _SnakeState extends State<Snake> {
       list.add(listTemp);
     }
     _pixelList = list;
+
+    int initialIndexX = (_pixelPerScreen / 2).round();
+    int initialIndexY = initialIndexX;
+    _snakeList.addAll([
+      Pixel(
+        posX: initialIndexX.toDouble(),
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.head,
+        directionEnum: _direction,
+      ),
+      /*Pixel(
+        posX: initialIndexX.toDouble(),
+        posY: initialIndexY.toDouble() - 1,
+        typePixelEnum: TypePixelEnum.tail,
+      ),*/
+    ]);
+
     _screenReady = true;
   }
 
@@ -55,6 +77,7 @@ class _SnakeState extends State<Snake> {
     _size = MediaQuery.of(context).size.width * 0.8;
     if (!_screenReady) {
       _constructPixelList();
+      _update();
     }
     return SafeArea(
       child: Scaffold(
@@ -70,11 +93,88 @@ class _SnakeState extends State<Snake> {
               const SizedBox(height: 20),
               ControlsWidget(
                 size: _size,
+                callbackClick: (directionEnum) {
+                  _direction = directionEnum;
+                  setState(() {});
+                },
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _update() {
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 300),
+      (Timer timer) {
+        _cleanScreen();
+        _showSnake();
+        _moveSnake();
+        setState(() {});
+      },
+    );
+  }
+
+  void _cleanScreen() {
+    for (int x = 0; x < _pixelList.length; x++) {
+      for (int y = 0; y < _pixelList[x].length; y++) {
+        _pixelList[x][y] = Pixel(
+          posX: _pixelList[x][y].posX,
+          posY: _pixelList[x][y].posY,
+          typePixelEnum: TypePixelEnum.clean,
+          directionEnum: null,
+        );
+      }
+    }
+  }
+
+  void _showSnake() {
+    for (int x = 0; x < _pixelList.length; x++) {
+      for (int y = 0; y < _pixelList[x].length; y++) {
+        for (Pixel snake in _snakeList) {
+          if (x == snake.posX && y == snake.posY) {
+            _pixelList[x][y] = Pixel(
+              posX: _pixelList[x][y].posX,
+              posY: _pixelList[x][y].posY,
+              typePixelEnum: snake.typePixelEnum,
+              directionEnum: snake.directionEnum,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  void _moveSnake() {
+    for (int i = 0; i < _snakeList.length; i++) {
+      _snakeList[i] = Pixel(
+        posX: _snakeList[i].posX + _getNextPosX(),
+        posY: _snakeList[i].posY + _getNextPosY(),
+        typePixelEnum: _snakeList[i].typePixelEnum,
+        directionEnum: _direction,
+      );
+    }
+  }
+
+  double _getNextPosX() {
+    if (_direction == DirectionEnum.right) {
+      return 1;
+    } else if (_direction == DirectionEnum.left) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+
+  double _getNextPosY() {
+    if (_direction == DirectionEnum.up) {
+      return -1;
+    } else if (_direction == DirectionEnum.down) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 }

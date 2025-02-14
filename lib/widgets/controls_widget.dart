@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:snake/enums/direction_enum.dart';
+import 'package:snake/widgets/button_control_widget.dart';
 
 class ControlsWidget extends StatelessWidget {
   final double size;
+  final void Function(DirectionEnum directionEnum) callbackClick;
 
   const ControlsWidget({
     super.key,
     required this.size,
+    required this.callbackClick,
   });
 
   @override
@@ -16,30 +20,30 @@ class ControlsWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            Icons.arrow_circle_up,
-            size: size / 3,
-            color: Colors.black87,
+          ButtonControlWidget(
+            size: size,
+            directionEnum: DirectionEnum.up,
+            callbackClick: callbackClick,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                Icons.arrow_circle_left_outlined,
-                size: size / 3,
-                color: Colors.black87,
+              ButtonControlWidget(
+                size: size,
+                directionEnum: DirectionEnum.left,
+                callbackClick: callbackClick,
               ),
-              Icon(
-                Icons.arrow_circle_right_outlined,
-                size: size / 3,
-                color: Colors.black87,
+              ButtonControlWidget(
+                size: size,
+                directionEnum: DirectionEnum.right,
+                callbackClick: callbackClick,
               ),
             ],
           ),
-          Icon(
-            Icons.arrow_circle_down,
-            size: size / 3,
-            color: Colors.black87,
+          ButtonControlWidget(
+            size: size,
+            directionEnum: DirectionEnum.down,
+            callbackClick: callbackClick,
           ),
         ],
       ),

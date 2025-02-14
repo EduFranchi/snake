@@ -44,6 +44,7 @@ class ScreenWidget extends StatelessWidget {
             child: PixelWidget(
               size: size,
               pixelPerScreen: pixelPerScreen,
+              pixel: pixel,
             ),
           ),
         );
