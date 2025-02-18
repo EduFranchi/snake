@@ -106,6 +106,7 @@ class _SnakeState extends State<Snake> {
               const SizedBox(height: 20),
               ControlsWidget(
                 size: _size,
+                directionNow: _direction,
                 callbackClick: (directionEnum) {
                   _direction = directionEnum;
                   setState(() {});

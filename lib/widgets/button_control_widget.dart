@@ -3,12 +3,14 @@ import 'package:snake/enums/direction_enum.dart';
 
 class ButtonControlWidget extends StatelessWidget {
   final double size;
+  final DirectionEnum directionNow;
   final DirectionEnum directionEnum;
   final void Function(DirectionEnum directionEnum) callbackClick;
 
   const ButtonControlWidget({
     super.key,
     required this.size,
+    required this.directionNow,
     required this.directionEnum,
     required this.callbackClick,
   });
@@ -39,6 +41,25 @@ class ButtonControlWidget extends StatelessWidget {
   }
 
   void _onTap() {
-    callbackClick.call(directionEnum);
+    DirectionEnum directionEnumTEMP = directionEnum;
+    switch (directionEnum) {
+      case DirectionEnum.up:
+        if (directionNow == DirectionEnum.down) {
+          directionEnumTEMP = directionNow;
+        }
+      case DirectionEnum.left:
+        if (directionNow == DirectionEnum.right) {
+          directionEnumTEMP = directionNow;
+        }
+      case DirectionEnum.right:
+        if (directionNow == DirectionEnum.left) {
+          directionEnumTEMP = directionNow;
+        }
+      case DirectionEnum.down:
+        if (directionNow == DirectionEnum.up) {
+          directionEnumTEMP = directionNow;
+        }
+    }
+    callbackClick.call(directionEnumTEMP);
   }
 }
