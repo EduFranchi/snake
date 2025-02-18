@@ -16,14 +16,12 @@ class Snake extends StatefulWidget {
 }
 
 class _SnakeState extends State<Snake> {
-  int _pixelPerScreen = 50;
+  final int _pixelPerScreen = 50;
   late double _size;
   bool _screenReady = false;
   DirectionEnum _direction = DirectionEnum.right;
   List<List<Pixel>> _pixelList = [];
-  List<Pixel> _snakeList = [];
-
-  late Timer _timer;
+  final List<Pixel> _snakeList = [];
 
   @override
   void initState() {
@@ -62,11 +60,26 @@ class _SnakeState extends State<Snake> {
         typePixelEnum: TypePixelEnum.head,
         directionEnum: _direction,
       ),
-      /*Pixel(
-        posX: initialIndexX.toDouble(),
-        posY: initialIndexY.toDouble() - 1,
+      Pixel(
+        posX: initialIndexX.toDouble() - 1,
+        posY: initialIndexY.toDouble(),
         typePixelEnum: TypePixelEnum.tail,
-      ),*/
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 2,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 3,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 4,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
     ]);
 
     _screenReady = true;
@@ -106,7 +119,7 @@ class _SnakeState extends State<Snake> {
   }
 
   void _update() {
-    _timer = Timer.periodic(
+    Timer.periodic(
       const Duration(milliseconds: 300),
       (Timer timer) {
         _cleanScreen();
@@ -148,31 +161,60 @@ class _SnakeState extends State<Snake> {
   }
 
   void _moveSnake() {
+    Pixel? last;
     for (int i = 0; i < _snakeList.length; i++) {
-      _snakeList[i] = Pixel(
-        posX: _snakeList[i].posX + _getNextPosX(),
-        posY: _snakeList[i].posY + _getNextPosY(),
-        typePixelEnum: _snakeList[i].typePixelEnum,
-        directionEnum: _direction,
-      );
+      Pixel lastTEMP = _snakeList[i];
+      if (_snakeList[i].typePixelEnum == TypePixelEnum.head) {
+        _snakeList[i] = Pixel(
+          posX: _snakeList[i].posX + _getNextPosX(_snakeList[i].posX),
+          posY: _snakeList[i].posY + _getNextPosY(_snakeList[i].posY),
+          typePixelEnum: _snakeList[i].typePixelEnum,
+          directionEnum: _direction,
+        );
+      } else if (_snakeList[i].typePixelEnum == TypePixelEnum.tail &&
+          last != null) {
+        _snakeList[i] = Pixel(
+          posX: last.posX,
+          posY: last.posY,
+          typePixelEnum: TypePixelEnum.tail,
+          directionEnum: last.directionEnum,
+        );
+      }
+      last = lastTEMP;
     }
   }
 
-  double _getNextPosX() {
+  double _getNextPosX(double posX) {
     if (_direction == DirectionEnum.right) {
-      return 1;
+      if (posX + 1 >= _pixelPerScreen) {
+        return -_pixelPerScreen.toDouble();
+      } else {
+        return 1;
+      }
     } else if (_direction == DirectionEnum.left) {
-      return -1;
+      if (posX - 1 < 0) {
+        return (_pixelPerScreen - 1).toDouble();
+      } else {
+        return -1;
+      }
     } else {
       return 0;
     }
   }
 
-  double _getNextPosY() {
+  double _getNextPosY(double posY) {
     if (_direction == DirectionEnum.up) {
-      return -1;
+      if (posY - 1 < 0) {
+        return (_pixelPerScreen - 1).toDouble();
+      } else {
+        return -1;
+      }
     } else if (_direction == DirectionEnum.down) {
-      return 1;
+      if (posY + 1 >= _pixelPerScreen) {
+        return -_pixelPerScreen.toDouble();
+      } else {
+        return 1;
+      }
     } else {
       return 0;
     }
