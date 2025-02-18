@@ -18,10 +18,13 @@ class Snake extends StatefulWidget {
 class _SnakeState extends State<Snake> {
   final int _pixelPerScreen = 50;
   late double _size;
+  bool _isStarted = false;
   bool _screenReady = false;
   DirectionEnum _direction = DirectionEnum.right;
   List<List<Pixel>> _pixelList = [];
-  final List<Pixel> _snakeList = [];
+  List<Pixel> _snakeList = [];
+
+  Timer? _timer;
 
   @override
   void initState() {
@@ -35,6 +38,7 @@ class _SnakeState extends State<Snake> {
   }
 
   void _constructPixelList() {
+    _snakeList = [];
     List<List<Pixel>> list = [];
     for (int x = 0; x < _pixelPerScreen; x++) {
       List<Pixel> listTemp = [];
@@ -80,15 +84,56 @@ class _SnakeState extends State<Snake> {
         posY: initialIndexY.toDouble(),
         typePixelEnum: TypePixelEnum.tail,
       ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 5,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 6,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 7,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 8,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 9,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 10,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
+      Pixel(
+        posX: initialIndexX.toDouble() - 11,
+        posY: initialIndexY.toDouble(),
+        typePixelEnum: TypePixelEnum.tail,
+      ),
     ]);
 
     _screenReady = true;
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size.width * 0.8;
-    if (!_screenReady) {
+    if (_isStarted && !_screenReady) {
       _constructPixelList();
       _update();
     }
@@ -102,6 +147,7 @@ class _SnakeState extends State<Snake> {
                 size: _size,
                 pixelPerScreen: _pixelPerScreen,
                 pixelList: _pixelList,
+                alternativeBody: _getBodyStart(),
               ),
               const SizedBox(height: 20),
               ControlsWidget(
@@ -119,16 +165,54 @@ class _SnakeState extends State<Snake> {
     );
   }
 
+  Widget? _getBodyStart() {
+    if (!_isStarted) {
+      return Center(
+        child: InkWell(
+          onTap: () {
+            _direction = DirectionEnum.right;
+            _isStarted = true;
+            _screenReady = false;
+            setState(() {});
+          },
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black87,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              'START',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return null;
+    }
+  }
+
   void _update() {
-    Timer.periodic(
+    _timer = Timer.periodic(
       const Duration(milliseconds: 300),
       (Timer timer) {
         _cleanScreen();
-        _showSnake();
         _moveSnake();
+        _getCollision();
+        _showSnake();
         setState(() {});
       },
     );
+    print('UUVVAA');
+    print(_timer?.isActive);
   }
 
   void _cleanScreen() {
@@ -218,6 +302,22 @@ class _SnakeState extends State<Snake> {
       }
     } else {
       return 0;
+    }
+  }
+
+  void _getCollision() {
+    bool hasCollision = false;
+    for (int i = 1; i < _snakeList.length; i++) {
+      if (_snakeList[0].posX == _snakeList[i].posX &&
+          _snakeList[0].posY == _snakeList[i].posY) {
+        hasCollision = true;
+        break;
+      }
+    }
+
+    if (hasCollision) {
+      _isStarted = false;
+      _timer?.cancel();
     }
   }
 }

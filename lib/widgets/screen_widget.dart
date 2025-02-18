@@ -6,12 +6,14 @@ class ScreenWidget extends StatelessWidget {
   final double size;
   final int pixelPerScreen;
   final List<List<Pixel>> pixelList;
+  final Widget? alternativeBody;
 
   const ScreenWidget({
     super.key,
     required this.size,
     required this.pixelPerScreen,
     required this.pixelList,
+    this.alternativeBody,
   });
 
   @override
@@ -25,10 +27,18 @@ class ScreenWidget extends StatelessWidget {
           width: 5,
         ),
       ),
-      child: Stack(
-        children: _writePixelList(),
-      ),
+      child: _getBody(),
     );
+  }
+
+  Widget _getBody() {
+    if (alternativeBody != null) {
+      return alternativeBody!;
+    } else {
+      return Stack(
+        children: _writePixelList(),
+      );
+    }
   }
 
   List<Widget> _writePixelList() {
